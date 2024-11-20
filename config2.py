@@ -50,7 +50,7 @@ def main():
     all_dependencies = get_transitive_dependencies(package_path, {}, repository_url, max_depth)
     #print(generate_plantuml(all_dependencies))
     with open(graph_output_path, 'w') as f:
-        f.write(generate_plantuml(all_dependencies))
+        f.write(generate_graphviz(all_dependencies))
 
 if __name__ == '__main__':
     main()
