@@ -48,9 +48,9 @@ def main():
     max_depth = 3
     # Получение всех зависимостей, включая транзитивные:
     all_dependencies = get_transitive_dependencies(package_path, {}, repository_url, max_depth)
-    #print(generate_plantuml(all_dependencies))
+    #print(generate_graphviz(all_dependencies))
     with open(graph_output_path, 'w') as f:
-        f.write(generate_plantuml(all_dependencies))
+        f.write(generate_graphviz(all_dependencies))
 
 if __name__ == '__main__':
     main()
