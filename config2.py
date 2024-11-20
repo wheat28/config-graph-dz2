@@ -49,6 +49,7 @@ def main():
     # Получение всех зависимостей, включая транзитивные:
     all_dependencies = get_transitive_dependencies(package_path, {}, repository_url, max_depth)
     #print(generate_graphviz(all_dependencies))
+    print('Граф создан в файл config.json!')
     with open(graph_output_path, 'w') as f:
         f.write(generate_graphviz(all_dependencies))
 
