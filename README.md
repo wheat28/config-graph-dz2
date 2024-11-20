@@ -89,3 +89,7 @@
 Граф зависимостей:
 
 ![graphviz](https://github.com/user-attachments/assets/44fac806-cc29-4afe-93c3-968a0683dbb4)
+
+Тесты программы:
+
+![image](https://github.com/user-attachments/assets/5b6b3c0c-c82d-4024-a2e9-0334f97861b1)
