@@ -1,57 +1,83 @@
-import sys
+import os
+import urllib.request
 import json
-import requests
 
-def generate_graphviz(graph):
-    uml = "digraph G {\n"
-    for package, deps in graph.items():
-        for dep in deps.keys():
-            uml += f'"{package}" -> "{dep}";\n'
-    uml += "}\n"
-    return uml
+def build_graphviz_code(dict_of_deps):
+    code_from_graph = "digraph Dependencies {\n"
+    for package, depends in dict_of_deps.items():
+        for dep in depends:
+            code_from_graph += f'  "{package}" -> "{dep}"\n'
+    code_from_graph += "}\n"
+    return code_from_graph
 
-def get_npm_dependencies(package_name, repurl):
-    url = f'{repurl}{package_name}'
-    response = requests.get(url)
+def get_npm_dependencies(pkg_name, repository_url):
+    npm_url = f'{repository_url}/{pkg_name}'  # Используем URL из конфигурации
 
-    if response.status_code != 200:
-        raise Exception(f"Failed to fetch package data: {response.status_code}")
-
-    package_data = response.json()
-    latest_version = package_data['dist-tags']['latest']
-    dependencies = package_data['versions'][latest_version].get('dependencies', {})
-    return dependencies
-
-def get_transitive_dependencies(package_name, collected, repurl, max_depth):
-    max_depth = max_depth - 1
-    if (max_depth == 0):
-        return
-    if package_name in collected:
-        return collected
     try:
-        dependencies = get_npm_dependencies(package_name, repurl)
-        collected[package_name] = dependencies
-        for dep in dependencies:
-            get_transitive_dependencies(dep, collected, repurl, max_depth)
-        return collected
-    except Exception as e:
-        print(e)
-        return collected
+        with urllib.request.urlopen(npm_url) as response:
+            if response.status != 200:
+                raise Exception(f"Ошибка получения данных пакета: {response.status}")
+            package_info = json.loads(response.read().decode())
 
-def main():
-    with open("config.json", 'r') as config_file:
-        config = json.load(config_file)
-    graphviz_path = config['graphviz_path']
-    package_path = config['package_path']
-    graph_output_path = config['graph_output_path']
-    repository_url = config['repository_url']
-    max_depth = 3
-    # Получение всех зависимостей, включая транзитивные:
-    all_dependencies = get_transitive_dependencies(package_path, {}, repository_url, max_depth)
-    print(generate_graphviz(all_dependencies))
-    print('Граф создан в файл config.json!')
-    with open(graph_output_path, 'w') as f:
-        f.write(generate_graphviz(all_dependencies))
+    except urllib.error.URLError as e:
+        raise Exception(f"Ошибка сети или неверный URL: {e}")
+    except json.JSONDecodeError:
+        raise Exception("Ошибка разбора JSON ответа.")
+
+    latest_version = package_info['dist-tags']['latest']
+    return package_info['versions'][latest_version].get('dependencies', {})
+
+def resolve_dependencies(pkg_name, dict_of_deps, registry_url):
+    if pkg_name in dict_of_deps:
+        return dict_of_deps
+
+    try:
+        dependencies = get_npm_dependencies(pkg_name, registry_url)
+        dict_of_deps[pkg_name] = dependencies
+        for dep in dependencies:
+            resolve_dependencies(dep, dict_of_deps, registry_url)
+
+    except Exception as e:
+        print(f"Ошибка обработки пакета {pkg_name}: {e}")
+
+    return dict_of_deps
+
+def write_to_file(file_path, code_of_deps):
+    try:
+        with open(file_path, 'w') as file:
+            file.write(code_of_deps)
+        print(f"Данные успешно сохранены в {file_path}")
+    except IOError as err:
+        print(f"Ошибка записи файла: {err}")
+
+def run():
+    configuration_filename = 'config.json'  # Используем JSON-файл
+    try:
+        with open(configuration_filename, 'r') as config_file:
+            settings = json.load(config_file)
+
+    except json.JSONDecodeError as err:
+        print(f"Ошибка разбора конфигурационного файла: {err}")
+        return
+
+    graphviz_path = settings.get('graphviz_path')
+    package_name = settings.get('package_name')
+    output_file = settings.get('path_to_result_file')
+    repository_url = settings.get('repository_url')
+
+    if not package_name:
+        print("Имя пакета не указано в конфигурации.")
+        return
+
+    print(f"Происходит получение зависимостей пакета {package_name}")
+    dependencies = resolve_dependencies(package_name, {}, repository_url)
+
+    graphviz_output = build_graphviz_code(dependencies)
+
+    print("Сгенерированный Graphviz код:")
+    print(graphviz_output)
+
+    write_to_file(output_file, graphviz_output)
 
 if __name__ == '__main__':
-    main()
+    run()
