@@ -1,4 +1,4 @@
-![graphviz (1)](https://github.com/user-attachments/assets/bb6e4b84-69b2-4a9e-9a2f-47fc2e479408)# Конфигурационное управление
+# Конфигурационное управление
 ## Вариант 21
 ### Задание 2
 Разработать инструмент командной строки для визуализации графа 
@@ -102,7 +102,7 @@ registry_url: URL репозитория пакетов.
 
 Граф зависимостей:
 
-![image](https://github.com/user-attachments/assets/cd967634-e5f6-4623-9d37-c44f062e57ea)
+![graphviz (1)](https://github.com/user-attachments/assets/bb6e4b84-69b2-4a9e-9a2f-47fc2e479408)
 
 Тесты программы:
 
