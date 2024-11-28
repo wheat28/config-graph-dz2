@@ -95,7 +95,6 @@ registry_url: URL репозитория пакетов.
 Выводит результат в консоль и записывает его в файл.
 
 ## Результаты тестирования
-
 Вывод кода графа в консоль:
 
 ![image](https://github.com/user-attachments/assets/df8e28f7-9085-4f51-9cfe-4785e30e8756)
@@ -111,4 +110,3 @@ registry_url: URL репозитория пакетов.
 Тесты программы:
 
 ![image](https://github.com/user-attachments/assets/d978dea9-e429-4ba6-9864-d5dfa7e0a5b6)
-
