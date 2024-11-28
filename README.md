@@ -96,6 +96,10 @@ registry_url: URL репозитория пакетов.
 
 ## Результаты тестирования
 
+Вывод кода графа в консоль:
+
+![image](https://github.com/user-attachments/assets/df8e28f7-9085-4f51-9cfe-4785e30e8756)
+
 Код зависимостей:
 
 ![image](https://github.com/user-attachments/assets/b6b19ba4-34a6-4a81-8eef-a22e2810f6f6)
